@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Khon 1 — Xem mô hình 3D &amp; AR</title>
 
-<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js" onerror="this.dataset.failed=1; document.getElementById('mv-fallback').src='https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js';"></script>
+<script type="module" id="mv-fallback"></script>
 
 <style>
   /* ============================================================
@@ -384,8 +385,8 @@
       loading="eager"
       reveal="auto">
 
-      <div class="poster-loading" slot="poster" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#9c9289;font-family:Inter;font-size:13px;">
-        Đang tải mô hình…
+      <div class="poster-loading" slot="poster" id="poster-loading" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;color:#9c9289;font-family:Inter;font-size:13px;padding:30px;">
+        <span id="poster-text">Đang tải mô hình…</span>
       </div>
 
       <button id="ar-btn" slot="ar-button">
@@ -491,6 +492,36 @@
       viewer.removeAttribute('auto-rotate');
     }
   });
+
+  // --- Chẩn đoán lỗi tải mô hình -------------------------------------
+  // Nếu model-viewer chưa được trình duyệt "định nghĩa" (script CDN bị chặn/lỗi mạng),
+  // hoặc file .glb không tải được, hiển thị thông báo rõ ràng thay vì treo mãi.
+  const posterText = document.getElementById('poster-text');
+
+  customElements.whenDefined('model-viewer').then(()=>{
+    // thư viện đã sẵn sàng — nếu vẫn không tải được model thì lỗi nằm ở file .glb / mạng
+  }).catch(()=>{});
+
+  viewer.addEventListener('error', (event)=>{
+    console.error('model-viewer error:', event.detail);
+    posterText.innerHTML =
+      'Không tải được mô hình 3D.<br>Kiểm tra: file <code>Khon1.glb</code> có nằm cùng thư mục ' +
+      'với trang này trên host không, và trang có đang mở qua https không.';
+  });
+
+  setTimeout(()=>{
+    if (typeof customElements.get('model-viewer') === 'undefined') {
+      posterText.innerHTML =
+        'Không tải được thư viện xem 3D (model-viewer).<br>Có thể do mạng chặn ' +
+        'ajax.googleapis.com — thử đổi sang Wi-Fi khác hoặc tắt trình chặn quảng cáo/VPN rồi tải lại trang.';
+      return;
+    }
+    if (!viewer.loaded) {
+      posterText.innerHTML =
+        'Mô hình đang tải lâu hơn bình thường.<br>Kiểm tra kết nối mạng, hoặc thử tải trực tiếp ' +
+        '<a href="Khon1.glb" style="color:#e4c98a" target="_blank">file Khon1.glb</a> để xác nhận đường dẫn đúng.';
+    }
+  }, 12000);
 
   // QR code (uses current page URL — works once hosted online)
   document.getElementById('qr-toggle').addEventListener('click', ()=>{
