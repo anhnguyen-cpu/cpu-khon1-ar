@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="th">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Khon 1 — Xem mô hình 3D &amp; AR</title>
+<title>หนุมาน — โมเดล 3D และ AR</title>
 
 <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js" onerror="this.dataset.failed=1; document.getElementById('mv-fallback').src='https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js';"></script>
 <script type="module" id="mv-fallback"></script>
@@ -11,14 +11,14 @@
 <style>
   /* ============================================================
      BẢNG MÀU / TYPE (Design tokens)
-     - Nền: sơn mài đen  #0B0A0C
-     - Bề mặt: nâu than  #16131A
-     - Đỏ son (accent chính): #7A1620
-     - Vàng lá (accent phụ): #C9A15A
-     - Chữ chính: #F2EAD8 (ngà)
-     - Chữ phụ:   #9C9289
+     - พื้นหลัง: ดำเคลือบเงา  #0B0A0C
+     - พื้นผิว: น้ำตาลไหม้     #16131A
+     - แดงชาด (สีหลัก):        #7A1620
+     - ทองคำเปลว (สีรอง):      #C9A15A
+     - ตัวอักษรหลัก:           #F2EAD8 (งาช้าง)
+     - ตัวอักษรรอง:            #9C9289
      ============================================================ */
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Inter:wght@400;500;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap');
 
   :root{
     --bg:#0b0a0c;
@@ -38,12 +38,11 @@
     margin:0; padding:0; height:100%;
     background:var(--bg);
     color:var(--ink);
-    font-family:'Inter', 'Be Vietnam Pro', sans-serif;
+    font-family:'Noto Sans Thai', 'Inter', sans-serif;
     -webkit-font-smoothing:antialiased;
     overflow-x:hidden;
   }
 
-  /* subtle vignette + ember texture on the whole page */
   body{
     background:
       radial-gradient(ellipse 900px 500px at 50% -10%, rgba(122,22,32,0.35), transparent 60%),
@@ -58,29 +57,29 @@
   }
   .eyebrow{
     font-size:11px;
-    letter-spacing:0.32em;
+    letter-spacing:0.28em;
     text-transform:uppercase;
     color:var(--gold);
     font-weight:600;
     margin-bottom:10px;
   }
   h1{
-    font-family:'Playfair Display', serif;
+    font-family:'Noto Serif Thai', serif;
     font-weight:700;
-    font-size:clamp(28px, 6vw, 44px);
+    font-size:clamp(30px, 7vw, 46px);
     margin:0 0 8px;
     letter-spacing:0.01em;
   }
-  h1 em{
-    font-style:italic;
+  h1 span{
     color:var(--gold-soft);
+    font-weight:500;
   }
   .subtitle{
     color:var(--ink-dim);
     font-size:14px;
     max-width:520px;
     margin:0 auto;
-    line-height:1.6;
+    line-height:1.7;
   }
 
   /* ---------- viewer stage ---------- */
@@ -100,14 +99,11 @@
       linear-gradient(180deg, var(--surface) 0%, #0e0c10 100%);
     box-shadow: 0 30px 70px -30px rgba(0,0,0,0.8), inset 0 0 0 1px rgba(255,255,255,0.02);
   }
-  /* spotlight ring signature element */
   .stage::before{
     content:"";
     position:absolute;
     inset:0;
     pointer-events:none;
-    background:
-      radial-gradient(circle at 50% 45%, transparent 0 30%, rgba(0,0,0,0) 31%);
     box-shadow: inset 0 0 120px 20px rgba(0,0,0,0.55);
     z-index:2;
   }
@@ -146,7 +142,7 @@
 
   .hint{
     position:absolute;
-    left:0; right:0; bottom:14px;
+    left:0; right:0; top:14px;
     text-align:center;
     font-size:12px;
     color:var(--ink-dim);
@@ -154,53 +150,93 @@
     z-index:3;
     pointer-events:none;
     display:flex;
-    gap:18px;
+    gap:16px;
     justify-content:center;
     flex-wrap:wrap;
     padding:0 12px;
   }
-  .hint span{ display:inline-flex; align-items:center; gap:6px; }
+  .hint span{
+    display:inline-flex; align-items:center; gap:6px;
+    background:rgba(11,10,12,0.55);
+    backdrop-filter:blur(3px);
+    padding:5px 10px;
+    border-radius:999px;
+    border:1px solid rgba(201,161,90,0.18);
+  }
 
-  /* AR button */
-  #ar-btn{
+  /* ---------- AR controls (ปรับใหม่ให้ใช้งานง่ายขึ้น) ---------- */
+  .ar-dock{
     position:absolute;
-    right:16px; bottom:16px;
-    z-index:4;
+    left:0; right:0; bottom:16px;
+    z-index:5;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    padding:0 16px;
+  }
+  #ar-btn{
     display:inline-flex;
     align-items:center;
-    gap:8px;
+    justify-content:center;
+    gap:10px;
     background:linear-gradient(180deg, var(--red-bright), var(--red));
     color:var(--ink);
-    border:1px solid rgba(228,201,138,0.35);
-    padding:11px 18px;
+    border:1px solid rgba(228,201,138,0.4);
+    padding:14px 26px;
+    min-height:50px;
     border-radius:999px;
-    font-family:'Inter';
-    font-weight:600;
-    font-size:13px;
-    letter-spacing:0.02em;
+    font-family:'Noto Sans Thai';
+    font-weight:700;
+    font-size:15px;
+    letter-spacing:0.01em;
     cursor:pointer;
-    box-shadow:0 10px 24px -8px rgba(122,22,32,0.7);
+    box-shadow:0 12px 28px -8px rgba(122,22,32,0.75);
+    animation:pulse-ar 2.4s ease-in-out 3;
   }
+  @keyframes pulse-ar{
+    0%,100%{ box-shadow:0 12px 28px -8px rgba(122,22,32,0.75); }
+    50%{ box-shadow:0 12px 34px -4px rgba(201,161,90,0.55); }
+  }
+  @media (prefers-reduced-motion: reduce){ #ar-btn{ animation:none; } }
   #ar-btn:focus-visible, .icon-btn:focus-visible, .tab:focus-visible, .qr-toggle:focus-visible{
     outline:2px solid var(--gold-soft);
     outline-offset:2px;
   }
-  #ar-btn svg{ width:16px; height:16px; }
+  #ar-btn svg{ width:20px; height:20px; flex:0 0 auto; }
 
   .icon-btn{
     position:absolute;
     left:16px; bottom:16px;
-    z-index:4;
-    width:38px; height:38px;
+    z-index:5;
+    width:46px; height:46px;
     border-radius:50%;
-    background:rgba(22,19,26,0.7);
+    background:rgba(22,19,26,0.75);
     border:1px solid var(--line);
     color:var(--gold-soft);
     display:flex; align-items:center; justify-content:center;
     cursor:pointer;
     backdrop-filter:blur(4px);
   }
-  .icon-btn svg{ width:17px; height:17px; }
+  .icon-btn svg{ width:19px; height:19px; }
+
+  .ar-toast{
+    position:absolute;
+    left:50%; top:16px;
+    transform:translateX(-50%) translateY(-140%);
+    z-index:6;
+    background:rgba(11,10,12,0.88);
+    border:1px solid var(--gold);
+    color:var(--gold-soft);
+    font-size:13px;
+    font-weight:600;
+    padding:9px 18px;
+    border-radius:999px;
+    white-space:nowrap;
+    transition:transform .3s ease;
+    pointer-events:none;
+  }
+  .ar-toast.show{ transform:translateX(-50%) translateY(0); }
 
   /* ---------- info panel ---------- */
   .panel{
@@ -213,20 +249,21 @@
     gap:6px;
     border-bottom:1px solid var(--line);
     margin-bottom:18px;
+    overflow-x:auto;
   }
   .tab{
     background:none;
     border:none;
     color:var(--ink-dim);
-    font-family:'Inter';
+    font-family:'Noto Sans Thai';
     font-size:13px;
-    font-weight:600;
-    letter-spacing:0.03em;
+    font-weight:700;
+    letter-spacing:0.02em;
     padding:10px 4px;
-    margin-right:22px;
+    margin-right:24px;
     cursor:pointer;
     position:relative;
-    text-transform:uppercase;
+    white-space:nowrap;
   }
   .tab.active{ color:var(--gold-soft); }
   .tab.active::after{
@@ -242,8 +279,8 @@
   @keyframes fade{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;} }
 
   .info-title{
-    font-family:'Playfair Display';
-    font-size:22px;
+    font-family:'Noto Serif Thai';
+    font-size:23px;
     font-weight:700;
     margin:0 0 10px;
     color:var(--gold-soft);
@@ -251,7 +288,7 @@
   .info-text{
     color:#d9d2c4;
     font-size:15px;
-    line-height:1.85;
+    line-height:1.9;
     margin:0 0 16px;
   }
   .meta-grid{
@@ -269,38 +306,37 @@
   .meta-item .k{
     font-size:10px;
     text-transform:uppercase;
-    letter-spacing:0.14em;
+    letter-spacing:0.1em;
     color:var(--gold);
     margin-bottom:6px;
   }
-  .meta-item .v{ font-size:14px; color:var(--ink); }
+  .meta-item .v{ font-size:14px; color:var(--ink); line-height:1.5; }
 
   .howto{
     list-style:none;
     padding:0; margin:0;
     display:grid;
-    gap:12px;
+    gap:14px;
   }
   .howto li{
     display:flex;
     gap:12px;
     align-items:flex-start;
-    font-size:14px;
+    font-size:14.5px;
     color:#d9d2c4;
-    line-height:1.6;
+    line-height:1.7;
   }
   .howto .num{
     flex:0 0 auto;
-    width:26px; height:26px;
+    width:28px; height:28px;
     border-radius:50%;
     border:1px solid var(--gold);
     color:var(--gold-soft);
     display:flex; align-items:center; justify-content:center;
     font-size:12px; font-weight:700;
-    font-family:'Inter';
+    font-family:'Noto Sans Thai';
   }
 
-  /* QR */
   .qr-toggle{
     display:inline-flex;
     align-items:center;
@@ -308,10 +344,11 @@
     background:transparent;
     border:1px solid var(--line);
     color:var(--gold-soft);
-    padding:9px 16px;
+    padding:11px 18px;
+    min-height:44px;
     border-radius:999px;
-    font-size:13px;
-    font-weight:600;
+    font-size:13.5px;
+    font-weight:700;
     cursor:pointer;
     margin-top:6px;
   }
@@ -344,17 +381,17 @@
     padding:20px 16px 34px;
     color:var(--ink-dim);
     font-size:11px;
-    letter-spacing:0.04em;
+    letter-spacing:0.03em;
   }
 </style>
 </head>
 <body>
 
 <header class="top">
-  <div class="eyebrow">Mô hình 3D · Thực tế tăng cường</div>
-  <h1>Khon <em>01</em></h1>
-  <p class="subtitle">Chạm để xoay quanh mô hình 360°, chụm hai ngón tay để phóng to hoặc thu nhỏ,
-    và nhấn nút AR để đặt mô hình vào không gian thật quanh bạn.</p>
+  <div class="eyebrow">โมเดลสามมิติ · ความเป็นจริงเสริม (AR)</div>
+  <h1>หนุมาน <span>วานรเผือก</span></h1>
+  <p class="subtitle">ลากนิ้วบนโมเดลเพื่อหมุนดูรอบทิศ 360° บีบสองนิ้วเพื่อซูมเข้า-ออก
+    และแตะปุ่มสีแดงเพื่อนำหนุมานมาวางไว้ในพื้นที่จริงรอบตัวคุณ</p>
 </header>
 
 <div class="stage-wrap">
@@ -364,7 +401,7 @@
     <model-viewer
       id="viewer"
       src="Khon1.glb"
-      alt="Mô hình 3D Khon 1"
+      alt="โมเดลสามมิติหนุมาน"
       camera-controls
       touch-action="pan-y"
       auto-rotate
@@ -385,90 +422,101 @@
       loading="eager"
       reveal="auto">
 
-      <div class="poster-loading" slot="poster" id="poster-loading" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;color:#9c9289;font-family:Inter;font-size:13px;padding:30px;">
-        <span id="poster-text">Đang tải mô hình…</span>
+      <div class="poster-loading" slot="poster" id="poster-loading" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;color:#9c9289;font-family:'Noto Sans Thai';font-size:13px;padding:30px;">
+        <span id="poster-text">กำลังโหลดโมเดล…</span>
       </div>
 
-      <button id="ar-btn" slot="ar-button">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="M3 7l9 5 9-5"/><path d="M12 12v10"/></svg>
-        Xem trong AR
-      </button>
+      <div class="ar-toast" id="ar-toast"></div>
+
+      <div class="hint">
+        <span>✦ ลากเพื่อหมุน 360°</span>
+        <span>✦ บีบนิ้วเพื่อซูม</span>
+      </div>
+
+      <div class="ar-dock">
+        <button id="ar-btn" slot="ar-button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="M3 7l9 5 9-5"/><path d="M12 12v10"/></svg>
+          ดูหนุมานแบบ AR
+        </button>
+      </div>
     </model-viewer>
 
-    <button class="icon-btn" id="reset-btn" title="Đặt lại góc nhìn" aria-label="Đặt lại góc nhìn">
+    <button class="icon-btn" id="reset-btn" title="รีเซ็ตมุมมอง" aria-label="รีเซ็ตมุมมอง">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 1 2.64 6.36"/><path d="M3 21v-5h5"/></svg>
     </button>
-
-    <div class="hint">
-      <span>✦ Kéo để xoay 360°</span>
-      <span>✦ Chụm để zoom</span>
-      <span>✦ Nút đỏ để xem AR</span>
-    </div>
   </div>
 </div>
 
 <div class="panel">
   <div class="tabs">
-    <button class="tab active" data-tab="info">Thông tin</button>
-    <button class="tab" data-tab="howto">Hướng dẫn</button>
-    <button class="tab" data-tab="share">Chia sẻ / Quét QR</button>
+    <button class="tab active" data-tab="info">ข้อมูล</button>
+    <button class="tab" data-tab="howto">วิธีใช้งาน</button>
+    <button class="tab" data-tab="share">แชร์ / สแกน QR</button>
   </div>
 
   <!-- ============================================================
-       KHU VỰC NỘI DUNG — chỉnh sửa văn bản bên dưới theo ý bạn.
-       Toàn bộ phần chữ hiển thị cho người xem nằm trong 3 khối
-       panel-body này (info / howto / share).
+       ส่วนเนื้อหา — แก้ไขข้อความด้านล่างนี้ได้ตามต้องการ
        ============================================================ -->
   <div class="panel-body active" id="tab-info">
-    <h2 class="info-title">Về mô hình này</h2>
+    <h2 class="info-title">หนุมาน คือใคร</h2>
     <p class="info-text">
-      Đây là bản dựng 3D của <strong>Khon 1</strong>. Thay đoạn văn bản này bằng phần
-      giới thiệu thật của bạn: nguồn gốc, chất liệu, ý nghĩa hoặc câu chuyện phía sau hiện vật —
-      nội dung sẽ hiển thị ngay tại đây cho người xem trên điện thoại.
+      หนุมานเป็นเทพวานรผู้เป็นตัวละครเอกในเรื่อง <strong>รามเกียรติ์</strong> วรรณคดีไทยที่มีรากมาจาก
+      มหากาพย์รามายณะของอินเดีย หนุมานเป็นทหารเอกคู่พระทัยของพระราม มีสติปัญญา ความกล้าหาญ
+      และความจงรักภักดีเป็นเลิศ จึงถือเป็นสัญลักษณ์แห่งความซื่อสัตย์และพลังอำนาจในวัฒนธรรมไทย
     </p>
     <p class="info-text">
-      Bạn có thể thêm nhiều đoạn văn bản như thế này, hoặc chèn thêm mục trong lưới thông tin bên dưới
-      (ví dụ: niên đại, chất liệu, kích thước, nghệ nhân...).
+      ตามตำนาน หนุมานเกิดจากนางสวาหะกับพระพาย (เทพแห่งลม) โดยกระโดดออกจากปากมารดาขึ้นสู่ท้องฟ้า
+      ตั้งแต่แรกเกิดก็มีกายสูงใหญ่ ผิวขาวผ่อง และแสดงฤทธิ์ได้ทันที ด้วยเหตุที่เป็นบุตรแห่งลม
+      หนุมานจึงมีความเป็นอมตะ หากถึงแก่ความตายเพียงมีลมพัดผ่านก็จะฟื้นคืนชีพขึ้นใหม่
+    </p>
+    <p class="info-text">
+      ลักษณะเด่นของหนุมานคือกายสีขาว สวมกุณฑล (ตุ้มหู) มีขนเป็นเพชร เขี้ยวแก้วกลางเพดานปาก
+      และหาวเป็นดาวเป็นเดือน เมื่อแสดงฤทธิ์เต็มที่จะปรากฏสี่หน้าแปดกร หนุมานมีอาวุธคู่กายคือ
+      ตรีเพชร ซึ่งพระอิศวรประทานให้ และยังสามารถขยายร่างกายให้ใหญ่โต หรือยืดหางให้ยาวได้ตามใจปรารถนา
     </p>
     <div class="meta-grid">
-      <div class="meta-item"><div class="k">Chất liệu</div><div class="v">— điền vào đây —</div></div>
-      <div class="meta-item"><div class="k">Niên đại</div><div class="v">— điền vào đây —</div></div>
-      <div class="meta-item"><div class="k">Kích thước</div><div class="v">— điền vào đây —</div></div>
-      <div class="meta-item"><div class="k">Nguồn</div><div class="v">— điền vào đây —</div></div>
+      <div class="meta-item"><div class="k">ที่มา</div><div class="v">วรรณคดีเรื่องรามเกียรติ์</div></div>
+      <div class="meta-item"><div class="k">บทบาท</div><div class="v">ทหารเอกของพระราม</div></div>
+      <div class="meta-item"><div class="k">บิดา-มารดา</div><div class="v">พระพาย และนางสวาหะ</div></div>
+      <div class="meta-item"><div class="k">อาวุธประจำกาย</div><div class="v">ตรีเพชร</div></div>
+      <div class="meta-item"><div class="k">สีกาย</div><div class="v">ขาวผ่อง (ลิงเผือก)</div></div>
+      <div class="meta-item"><div class="k">ลักษณะพิเศษ</div><div class="v">อมตะ, สี่หน้าแปดกรเมื่อแสดงฤทธิ์</div></div>
     </div>
   </div>
 
   <div class="panel-body" id="tab-howto">
-    <h2 class="info-title">Cách xem</h2>
+    <h2 class="info-title">วิธีชมโมเดล</h2>
     <ul class="howto">
-      <li><span class="num">1</span> Dùng một ngón tay kéo trên mô hình để xoay 360° theo mọi hướng.</li>
-      <li><span class="num">2</span> Chụm hai ngón tay lại hoặc mở ra để thu nhỏ / phóng to.</li>
-      <li><span class="num">3</span> Nhấn nút <strong>“Xem trong AR”</strong> (góc dưới bên phải) — điện thoại sẽ mở camera, hãy di chuyển nhẹ để máy nhận diện mặt phẳng rồi chạm để đặt mô hình vào không gian thật.</li>
-      <li><span class="num">4</span> Trên iPhone, AR cần trình duyệt Safari; trên Android, AR hoạt động tốt nhất với Chrome (có hỗ trợ Google Scene Viewer / ARCore).</li>
+      <li><span class="num">1</span> ใช้นิ้วลากบนโมเดลเพื่อหมุนดูรอบทิศทาง 360 องศา</li>
+      <li><span class="num">2</span> บีบสองนิ้วเข้าหากันหรือแยกออกเพื่อซูมเข้า-ออก</li>
+      <li><span class="num">3</span> แตะปุ่มสีแดง <strong>"ดูหนุมานแบบ AR"</strong> ด้านล่าง — กล้องโทรศัพท์จะเปิดขึ้น
+        ให้ค่อย ๆ ขยับโทรศัพท์ช้า ๆ ไปมาเพื่อให้ระบบตรวจจับพื้นราบ จากนั้นแตะหน้าจอเพื่อวางหนุมานลงในพื้นที่จริง</li>
+      <li><span class="num">4</span> เมื่อวางแล้ว สามารถเดินรอบโมเดล ใช้สองนิ้วหมุนหรือบีบซูมเพื่อปรับขนาดได้อีกครั้ง</li>
+      <li><span class="num">5</span> บนไอโฟน ต้องใช้ Safari และ iOS ที่รองรับ ARKit ส่วนบนแอนดรอยด์
+        แนะนำให้ใช้ Chrome ซึ่งรองรับ Google Scene Viewer / ARCore ได้ดีที่สุด</li>
     </ul>
   </div>
 
   <div class="panel-body" id="tab-share">
-    <h2 class="info-title">Chia sẻ để quét bằng camera</h2>
+    <h2 class="info-title">แชร์ให้คนอื่นสแกนดู</h2>
     <p class="info-text">
-      Để người khác chỉ cần <strong>mở camera điện thoại và quét mã</strong> là xem được mô hình này,
-      trang cần được lưu trên một địa chỉ web (https) — ví dụ GitHub Pages, Netlify, Vercel,
-      hoặc hosting bất kỳ. Sau khi tải trang này (kèm file <code>Khon1.glb</code>) lên host,
-      mở đúng đường dẫn đó trên điện thoại và bấm nút bên dưới để lấy mã QR.
+      หากต้องการให้คนอื่นเพียง <strong>เปิดกล้องโทรศัพท์แล้วสแกน</strong> ก็เห็นหนุมานได้ทันที
+      หน้าเว็บนี้ต้องถูกอัปโหลดขึ้นที่อยู่เว็บไซต์จริง (https) เช่น GitHub Pages, Netlify หรือ Vercel
+      หลังจากอัปโหลดไฟล์ <code>index.html</code> พร้อมกับ <code>Khon1.glb</code> แล้ว
+      ให้เปิดลิงก์นั้นบนโทรศัพท์แล้วกดปุ่มด้านล่างเพื่อสร้างคิวอาร์โค้ด
     </p>
-    <button class="qr-toggle" id="qr-toggle">Tạo mã QR cho trang này</button>
+    <button class="qr-toggle" id="qr-toggle">สร้างคิวอาร์โค้ดของหน้านี้</button>
     <div class="qr-box" id="qr-box">
-      <img id="qr-img" alt="Mã QR liên kết đến trang này">
+      <img id="qr-img" alt="คิวอาร์โค้ดลิงก์ไปยังหน้านี้">
       <div class="qr-url" id="qr-url"></div>
-      <p>Mở camera mặc định trên điện thoại và hướng vào mã QR này.</p>
+      <p>เปิดกล้องหลักของโทรศัพท์แล้วส่องไปที่คิวอาร์โค้ดนี้ได้เลย</p>
     </div>
   </div>
 </div>
 
-<footer>KHON 1 · MÔ HÌNH 3D TƯƠNG TÁC &amp; AR</footer>
+<footer>หนุมาน · โมเดล 3D เชิงโต้ตอบ และ AR</footer>
 
 <script>
-  // Tabs
   document.querySelectorAll('.tab').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
@@ -478,52 +526,69 @@
     });
   });
 
-  // Reset camera view
   const viewer = document.getElementById('viewer');
+
   document.getElementById('reset-btn').addEventListener('click', ()=>{
     viewer.cameraOrbit = '0deg 75deg 105%';
     viewer.cameraTarget = 'auto auto auto';
     viewer.fieldOfView = 'auto';
   });
 
-  // Stop auto-rotate once user interacts
   viewer.addEventListener('camera-change', (e)=>{
     if(e.detail.source === 'user-interaction'){
       viewer.removeAttribute('auto-rotate');
     }
   });
 
-  // --- Chẩn đoán lỗi tải mô hình -------------------------------------
-  // Nếu model-viewer chưa được trình duyệt "định nghĩa" (script CDN bị chặn/lỗi mạng),
-  // hoặc file .glb không tải được, hiển thị thông báo rõ ràng thay vì treo mãi.
-  const posterText = document.getElementById('poster-text');
+  const arToast = document.getElementById('ar-toast');
+  function showArToast(text, autoHideMs){
+    arToast.textContent = text;
+    arToast.classList.add('show');
+    if(autoHideMs){
+      clearTimeout(showArToast._t);
+      showArToast._t = setTimeout(()=> arToast.classList.remove('show'), autoHideMs);
+    }
+  }
+  viewer.addEventListener('ar-status', (event)=>{
+    switch(event.detail.status){
+      case 'session-started':
+        showArToast('กำลังค้นหาพื้นที่ว่าง — ค่อย ๆ ขยับโทรศัพท์ไปมา');
+        break;
+      case 'object-placed':
+        showArToast('วางหนุมานเรียบร้อย ✓', 2500);
+        break;
+      case 'failed':
+        showArToast('เปิด AR ไม่สำเร็จ ลองใหม่อีกครั้ง', 3500);
+        break;
+      case 'not-presenting':
+        arToast.classList.remove('show');
+        break;
+    }
+  });
 
-  customElements.whenDefined('model-viewer').then(()=>{
-    // thư viện đã sẵn sàng — nếu vẫn không tải được model thì lỗi nằm ở file .glb / mạng
-  }).catch(()=>{});
+  const posterText = document.getElementById('poster-text');
 
   viewer.addEventListener('error', (event)=>{
     console.error('model-viewer error:', event.detail);
     posterText.innerHTML =
-      'Không tải được mô hình 3D.<br>Kiểm tra: file <code>Khon1.glb</code> có nằm cùng thư mục ' +
-      'với trang này trên host không, và trang có đang mở qua https không.';
+      'โหลดโมเดล 3D ไม่สำเร็จ<br>ตรวจสอบว่าไฟล์ <code>Khon1.glb</code> อยู่ในโฟลเดอร์เดียวกับหน้านี้ ' +
+      'บนโฮสต์ และหน้านี้เปิดผ่าน https หรือไม่';
   });
 
   setTimeout(()=>{
     if (typeof customElements.get('model-viewer') === 'undefined') {
       posterText.innerHTML =
-        'Không tải được thư viện xem 3D (model-viewer).<br>Có thể do mạng chặn ' +
-        'ajax.googleapis.com — thử đổi sang Wi-Fi khác hoặc tắt trình chặn quảng cáo/VPN rồi tải lại trang.';
+        'โหลดไลบรารีแสดงผล 3D ไม่สำเร็จ<br>เครือข่ายอาจปิดกั้น ajax.googleapis.com — ' +
+        'ลองเปลี่ยน Wi-Fi หรือปิดตัวบล็อกโฆษณา/VPN แล้วโหลดหน้านี้ใหม่';
       return;
     }
     if (!viewer.loaded) {
       posterText.innerHTML =
-        'Mô hình đang tải lâu hơn bình thường.<br>Kiểm tra kết nối mạng, hoặc thử tải trực tiếp ' +
-        '<a href="Khon1.glb" style="color:#e4c98a" target="_blank">file Khon1.glb</a> để xác nhận đường dẫn đúng.';
+        'โมเดลกำลังโหลดนานกว่าปกติ<br>ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต หรือลองเปิด ' +
+        '<a href="Khon1.glb" style="color:#e4c98a" target="_blank">ไฟล์ Khon1.glb</a> โดยตรงเพื่อตรวจสอบเส้นทางไฟล์';
     }
   }, 12000);
 
-  // QR code (uses current page URL — works once hosted online)
   document.getElementById('qr-toggle').addEventListener('click', ()=>{
     const box = document.getElementById('qr-box');
     const url = window.location.href;
