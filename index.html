@@ -9,21 +9,11 @@
 <script type="module" id="mv-fallback"></script>
 
 <style>
-  /* ============================================================
-     BẢNG MÀU / TYPE (Design tokens)
-     - พื้นหลัง: ดำเคลือบเงา  #0B0A0C
-     - พื้นผิว: น้ำตาลไหม้     #16131A
-     - แดงชาด (สีหลัก):        #7A1620
-     - ทองคำเปลว (สีรอง):      #C9A15A
-     - ตัวอักษรหลัก:           #F2EAD8 (งาช้าง)
-     - ตัวอักษรรอง:            #9C9289
-     ============================================================ */
   @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap');
 
   :root{
     --bg:#0b0a0c;
     --surface:#16131a;
-    --surface-2:#1d1922;
     --red:#7a1620;
     --red-bright:#9c1f2c;
     --gold:#c9a15a;
@@ -70,10 +60,7 @@
     margin:0 0 8px;
     letter-spacing:0.01em;
   }
-  h1 span{
-    color:var(--gold-soft);
-    font-weight:500;
-  }
+  h1 span{ color:var(--gold-soft); font-weight:500; }
   .subtitle{
     color:var(--ink-dim);
     font-size:14px;
@@ -82,7 +69,6 @@
     line-height:1.7;
   }
 
-  /* ---------- viewer stage ---------- */
   .stage-wrap{
     position:relative;
     max-width:920px;
@@ -101,8 +87,7 @@
   }
   .stage::before{
     content:"";
-    position:absolute;
-    inset:0;
+    position:absolute; inset:0;
     pointer-events:none;
     box-shadow: inset 0 0 120px 20px rgba(0,0,0,0.55);
     z-index:2;
@@ -164,18 +149,13 @@
     border:1px solid rgba(201,161,90,0.18);
   }
 
-  /* ---------- AR controls (ปรับใหม่ให้ใช้งานง่ายขึ้น) ---------- */
-  .ar-dock{
-    position:absolute;
-    left:0; right:0; bottom:16px;
-    z-index:5;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:10px;
-    padding:0 16px;
-  }
+  /* ปุ่ม AR ต้องเป็นลูกโดยตรงของ <model-viewer> พร้อม slot="ar-button"
+     เท่านั้น ห้ามห่อด้วย div อื่น มิฉะนั้นกลไก slot จะไม่ทำงานและปุ่มกดไม่ได้จริง */
   #ar-btn{
+    position:absolute;
+    left:50%; bottom:16px;
+    transform:translateX(-50%);
+    z-index:5;
     display:inline-flex;
     align-items:center;
     justify-content:center;
@@ -194,12 +174,20 @@
     box-shadow:0 12px 28px -8px rgba(122,22,32,0.75);
     animation:pulse-ar 2.4s ease-in-out 3;
   }
+  #ar-btn[disabled]{
+    background:#3a3540;
+    color:var(--ink-dim);
+    box-shadow:none;
+    cursor:not-allowed;
+    animation:none;
+    border-color:var(--line);
+  }
   @keyframes pulse-ar{
     0%,100%{ box-shadow:0 12px 28px -8px rgba(122,22,32,0.75); }
     50%{ box-shadow:0 12px 34px -4px rgba(201,161,90,0.55); }
   }
   @media (prefers-reduced-motion: reduce){ #ar-btn{ animation:none; } }
-  #ar-btn:focus-visible, .icon-btn:focus-visible, .tab:focus-visible, .qr-toggle:focus-visible{
+  #ar-btn:focus-visible, .icon-btn:focus-visible{
     outline:2px solid var(--gold-soft);
     outline-offset:2px;
   }
@@ -225,59 +213,25 @@
     left:50%; top:16px;
     transform:translateX(-50%) translateY(-140%);
     z-index:6;
-    background:rgba(11,10,12,0.88);
+    background:rgba(11,10,12,0.9);
     border:1px solid var(--gold);
     color:var(--gold-soft);
     font-size:13px;
     font-weight:600;
     padding:9px 18px;
     border-radius:999px;
-    white-space:nowrap;
+    max-width:88%;
+    text-align:center;
     transition:transform .3s ease;
     pointer-events:none;
   }
   .ar-toast.show{ transform:translateX(-50%) translateY(0); }
 
-  /* ---------- info panel ---------- */
   .panel{
     max-width:920px;
-    margin:18px auto 0;
+    margin:22px auto 0;
     padding:0 16px 40px;
   }
-  .tabs{
-    display:flex;
-    gap:6px;
-    border-bottom:1px solid var(--line);
-    margin-bottom:18px;
-    overflow-x:auto;
-  }
-  .tab{
-    background:none;
-    border:none;
-    color:var(--ink-dim);
-    font-family:'Noto Sans Thai';
-    font-size:13px;
-    font-weight:700;
-    letter-spacing:0.02em;
-    padding:10px 4px;
-    margin-right:24px;
-    cursor:pointer;
-    position:relative;
-    white-space:nowrap;
-  }
-  .tab.active{ color:var(--gold-soft); }
-  .tab.active::after{
-    content:"";
-    position:absolute; left:0; right:0; bottom:-1px;
-    height:2px;
-    background:var(--gold);
-    border-radius:2px;
-  }
-
-  .panel-body{ display:none; }
-  .panel-body.active{ display:block; animation:fade .25s ease; }
-  @keyframes fade{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;} }
-
   .info-title{
     font-family:'Noto Serif Thai';
     font-size:23px;
@@ -311,70 +265,6 @@
     margin-bottom:6px;
   }
   .meta-item .v{ font-size:14px; color:var(--ink); line-height:1.5; }
-
-  .howto{
-    list-style:none;
-    padding:0; margin:0;
-    display:grid;
-    gap:14px;
-  }
-  .howto li{
-    display:flex;
-    gap:12px;
-    align-items:flex-start;
-    font-size:14.5px;
-    color:#d9d2c4;
-    line-height:1.7;
-  }
-  .howto .num{
-    flex:0 0 auto;
-    width:28px; height:28px;
-    border-radius:50%;
-    border:1px solid var(--gold);
-    color:var(--gold-soft);
-    display:flex; align-items:center; justify-content:center;
-    font-size:12px; font-weight:700;
-    font-family:'Noto Sans Thai';
-  }
-
-  .qr-toggle{
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-    background:transparent;
-    border:1px solid var(--line);
-    color:var(--gold-soft);
-    padding:11px 18px;
-    min-height:44px;
-    border-radius:999px;
-    font-size:13.5px;
-    font-weight:700;
-    cursor:pointer;
-    margin-top:6px;
-  }
-  .qr-box{
-    display:none;
-    margin-top:16px;
-    padding:18px;
-    border:1px solid var(--line);
-    border-radius:14px;
-    background:var(--surface);
-    text-align:center;
-  }
-  .qr-box.open{ display:block; }
-  .qr-box img{
-    width:170px; height:170px;
-    background:#fff;
-    padding:8px;
-    border-radius:8px;
-  }
-  .qr-box p{ color:var(--ink-dim); font-size:12px; margin:12px 0 0; }
-  .qr-url{
-    word-break:break-all;
-    font-size:12px;
-    color:var(--gold-soft);
-    margin-top:6px;
-  }
 
   footer{
     text-align:center;
@@ -433,12 +323,11 @@
         <span>✦ บีบนิ้วเพื่อซูม</span>
       </div>
 
-      <div class="ar-dock">
-        <button id="ar-btn" slot="ar-button">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="M3 7l9 5 9-5"/><path d="M12 12v10"/></svg>
-          ดูหนุมานแบบ AR
-        </button>
-      </div>
+      <!-- ต้องเป็นลูกโดยตรงของ model-viewer เท่านั้น ห้ามห่อด้วย div -->
+      <button id="ar-btn" slot="ar-button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="M3 7l9 5 9-5"/><path d="M12 12v10"/></svg>
+        <span id="ar-btn-label">ดูหนุมานแบบ AR</span>
+      </button>
     </model-viewer>
 
     <button class="icon-btn" id="reset-btn" title="รีเซ็ตมุมมอง" aria-label="รีเซ็ตมุมมอง">
@@ -448,85 +337,39 @@
 </div>
 
 <div class="panel">
-  <div class="tabs">
-    <button class="tab active" data-tab="info">ข้อมูล</button>
-    <button class="tab" data-tab="howto">วิธีใช้งาน</button>
-    <button class="tab" data-tab="share">แชร์ / สแกน QR</button>
-  </div>
-
-  <!-- ============================================================
-       ส่วนเนื้อหา — แก้ไขข้อความด้านล่างนี้ได้ตามต้องการ
-       ============================================================ -->
-  <div class="panel-body active" id="tab-info">
-    <h2 class="info-title">หนุมาน คือใคร</h2>
-    <p class="info-text">
-      หนุมานเป็นเทพวานรผู้เป็นตัวละครเอกในเรื่อง <strong>รามเกียรติ์</strong> วรรณคดีไทยที่มีรากมาจาก
-      มหากาพย์รามายณะของอินเดีย หนุมานเป็นทหารเอกคู่พระทัยของพระราม มีสติปัญญา ความกล้าหาญ
-      และความจงรักภักดีเป็นเลิศ จึงถือเป็นสัญลักษณ์แห่งความซื่อสัตย์และพลังอำนาจในวัฒนธรรมไทย
-    </p>
-    <p class="info-text">
-      ตามตำนาน หนุมานเกิดจากนางสวาหะกับพระพาย (เทพแห่งลม) โดยกระโดดออกจากปากมารดาขึ้นสู่ท้องฟ้า
-      ตั้งแต่แรกเกิดก็มีกายสูงใหญ่ ผิวขาวผ่อง และแสดงฤทธิ์ได้ทันที ด้วยเหตุที่เป็นบุตรแห่งลม
-      หนุมานจึงมีความเป็นอมตะ หากถึงแก่ความตายเพียงมีลมพัดผ่านก็จะฟื้นคืนชีพขึ้นใหม่
-    </p>
-    <p class="info-text">
-      ลักษณะเด่นของหนุมานคือกายสีขาว สวมกุณฑล (ตุ้มหู) มีขนเป็นเพชร เขี้ยวแก้วกลางเพดานปาก
-      และหาวเป็นดาวเป็นเดือน เมื่อแสดงฤทธิ์เต็มที่จะปรากฏสี่หน้าแปดกร หนุมานมีอาวุธคู่กายคือ
-      ตรีเพชร ซึ่งพระอิศวรประทานให้ และยังสามารถขยายร่างกายให้ใหญ่โต หรือยืดหางให้ยาวได้ตามใจปรารถนา
-    </p>
-    <div class="meta-grid">
-      <div class="meta-item"><div class="k">ที่มา</div><div class="v">วรรณคดีเรื่องรามเกียรติ์</div></div>
-      <div class="meta-item"><div class="k">บทบาท</div><div class="v">ทหารเอกของพระราม</div></div>
-      <div class="meta-item"><div class="k">บิดา-มารดา</div><div class="v">พระพาย และนางสวาหะ</div></div>
-      <div class="meta-item"><div class="k">อาวุธประจำกาย</div><div class="v">ตรีเพชร</div></div>
-      <div class="meta-item"><div class="k">สีกาย</div><div class="v">ขาวผ่อง (ลิงเผือก)</div></div>
-      <div class="meta-item"><div class="k">ลักษณะพิเศษ</div><div class="v">อมตะ, สี่หน้าแปดกรเมื่อแสดงฤทธิ์</div></div>
-    </div>
-  </div>
-
-  <div class="panel-body" id="tab-howto">
-    <h2 class="info-title">วิธีชมโมเดล</h2>
-    <ul class="howto">
-      <li><span class="num">1</span> ใช้นิ้วลากบนโมเดลเพื่อหมุนดูรอบทิศทาง 360 องศา</li>
-      <li><span class="num">2</span> บีบสองนิ้วเข้าหากันหรือแยกออกเพื่อซูมเข้า-ออก</li>
-      <li><span class="num">3</span> แตะปุ่มสีแดง <strong>"ดูหนุมานแบบ AR"</strong> ด้านล่าง — กล้องโทรศัพท์จะเปิดขึ้น
-        ให้ค่อย ๆ ขยับโทรศัพท์ช้า ๆ ไปมาเพื่อให้ระบบตรวจจับพื้นราบ จากนั้นแตะหน้าจอเพื่อวางหนุมานลงในพื้นที่จริง</li>
-      <li><span class="num">4</span> เมื่อวางแล้ว สามารถเดินรอบโมเดล ใช้สองนิ้วหมุนหรือบีบซูมเพื่อปรับขนาดได้อีกครั้ง</li>
-      <li><span class="num">5</span> บนไอโฟน ต้องใช้ Safari และ iOS ที่รองรับ ARKit ส่วนบนแอนดรอยด์
-        แนะนำให้ใช้ Chrome ซึ่งรองรับ Google Scene Viewer / ARCore ได้ดีที่สุด</li>
-    </ul>
-  </div>
-
-  <div class="panel-body" id="tab-share">
-    <h2 class="info-title">แชร์ให้คนอื่นสแกนดู</h2>
-    <p class="info-text">
-      หากต้องการให้คนอื่นเพียง <strong>เปิดกล้องโทรศัพท์แล้วสแกน</strong> ก็เห็นหนุมานได้ทันที
-      หน้าเว็บนี้ต้องถูกอัปโหลดขึ้นที่อยู่เว็บไซต์จริง (https) เช่น GitHub Pages, Netlify หรือ Vercel
-      หลังจากอัปโหลดไฟล์ <code>index.html</code> พร้อมกับ <code>Khon1.glb</code> แล้ว
-      ให้เปิดลิงก์นั้นบนโทรศัพท์แล้วกดปุ่มด้านล่างเพื่อสร้างคิวอาร์โค้ด
-    </p>
-    <button class="qr-toggle" id="qr-toggle">สร้างคิวอาร์โค้ดของหน้านี้</button>
-    <div class="qr-box" id="qr-box">
-      <img id="qr-img" alt="คิวอาร์โค้ดลิงก์ไปยังหน้านี้">
-      <div class="qr-url" id="qr-url"></div>
-      <p>เปิดกล้องหลักของโทรศัพท์แล้วส่องไปที่คิวอาร์โค้ดนี้ได้เลย</p>
-    </div>
+  <h2 class="info-title">หนุมาน คือใคร</h2>
+  <p class="info-text">
+    หนุมานเป็นเทพวานรผู้เป็นตัวละครเอกในเรื่อง <strong>รามเกียรติ์</strong> วรรณคดีไทยที่มีรากมาจาก
+    มหากาพย์รามายณะของอินเดีย หนุมานเป็นทหารเอกคู่พระทัยของพระราม มีสติปัญญา ความกล้าหาญ
+    และความจงรักภักดีเป็นเลิศ จึงถือเป็นสัญลักษณ์แห่งความซื่อสัตย์และพลังอำนาจในวัฒนธรรมไทย
+  </p>
+  <p class="info-text">
+    ตามตำนาน หนุมานเกิดจากนางสวาหะกับพระพาย (เทพแห่งลม) โดยกระโดดออกจากปากมารดาขึ้นสู่ท้องฟ้า
+    ตั้งแต่แรกเกิดก็มีกายสูงใหญ่ ผิวขาวผ่อง และแสดงฤทธิ์ได้ทันที ด้วยเหตุที่เป็นบุตรแห่งลม
+    หนุมานจึงมีความเป็นอมตะ หากถึงแก่ความตายเพียงมีลมพัดผ่านก็จะฟื้นคืนชีพขึ้นใหม่
+  </p>
+  <p class="info-text">
+    ลักษณะเด่นของหนุมานคือกายสีขาว สวมกุณฑล (ตุ้มหู) มีขนเป็นเพชร เขี้ยวแก้วกลางเพดานปาก
+    และหาวเป็นดาวเป็นเดือน เมื่อแสดงฤทธิ์เต็มที่จะปรากฏสี่หน้าแปดกร หนุมานมีอาวุธคู่กายคือ
+    ตรีเพชร ซึ่งพระอิศวรประทานให้ และยังสามารถขยายร่างกายให้ใหญ่โต หรือยืดหางให้ยาวได้ตามใจปรารถนา
+  </p>
+  <div class="meta-grid">
+    <div class="meta-item"><div class="k">ที่มา</div><div class="v">วรรณคดีเรื่องรามเกียรติ์</div></div>
+    <div class="meta-item"><div class="k">บทบาท</div><div class="v">ทหารเอกของพระราม</div></div>
+    <div class="meta-item"><div class="k">บิดา-มารดา</div><div class="v">พระพาย และนางสวาหะ</div></div>
+    <div class="meta-item"><div class="k">อาวุธประจำกาย</div><div class="v">ตรีเพชร</div></div>
+    <div class="meta-item"><div class="k">สีกาย</div><div class="v">ขาวผ่อง (ลิงเผือก)</div></div>
+    <div class="meta-item"><div class="k">ลักษณะพิเศษ</div><div class="v">อมตะ, สี่หน้าแปดกรเมื่อแสดงฤทธิ์</div></div>
   </div>
 </div>
 
 <footer>หนุมาน · โมเดล 3D เชิงโต้ตอบ และ AR</footer>
 
 <script>
-  document.querySelectorAll('.tab').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
-      document.querySelectorAll('.panel-body').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
-    });
-  });
-
   const viewer = document.getElementById('viewer');
+  const arBtn = document.getElementById('ar-btn');
+  const arBtnLabel = document.getElementById('ar-btn-label');
+  const arToast = document.getElementById('ar-toast');
 
   document.getElementById('reset-btn').addEventListener('click', ()=>{
     viewer.cameraOrbit = '0deg 75deg 105%';
@@ -540,7 +383,6 @@
     }
   });
 
-  const arToast = document.getElementById('ar-toast');
   function showArToast(text, autoHideMs){
     arToast.textContent = text;
     arToast.classList.add('show');
@@ -549,16 +391,18 @@
       showArToast._t = setTimeout(()=> arToast.classList.remove('show'), autoHideMs);
     }
   }
+
+  // สถานะ AR แบบสด
   viewer.addEventListener('ar-status', (event)=>{
     switch(event.detail.status){
       case 'session-started':
         showArToast('กำลังค้นหาพื้นที่ว่าง — ค่อย ๆ ขยับโทรศัพท์ไปมา');
         break;
       case 'object-placed':
-        showArToast('วางหนุมานเรียบร้อย ✓', 2500);
+        showArToast('วางหนุมานเรียบร้อย ✓ ลากนิ้วเพื่อหมุน บีบนิ้วเพื่อย่อ-ขยาย', 4000);
         break;
       case 'failed':
-        showArToast('เปิด AR ไม่สำเร็จ ลองใหม่อีกครั้ง', 3500);
+        showArToast('เปิด AR ไม่สำเร็จ ลองใหม่อีกครั้ง หรือตรวจสอบสิทธิ์กล้อง', 4000);
         break;
       case 'not-presenting':
         arToast.classList.remove('show');
@@ -566,6 +410,31 @@
     }
   });
 
+  // ตรวจสอบว่าอุปกรณ์รองรับ AR หรือไม่ — ถ้าไม่รองรับ ปิดปุ่มและอธิบายเหตุผลให้ชัดเจน
+  // แทนที่จะปล่อยให้ผู้ใช้กดแล้วไม่มีอะไรเกิดขึ้น
+  function refreshArAvailability(){
+    if (viewer.canActivateAR) {
+      arBtn.disabled = false;
+      arBtnLabel.textContent = 'ดูหนุมานแบบ AR';
+    } else {
+      arBtn.disabled = true;
+      arBtnLabel.textContent = 'อุปกรณ์นี้ไม่รองรับ AR';
+    }
+  }
+  customElements.whenDefined('model-viewer').then(()=>{
+    viewer.addEventListener('load', refreshArAvailability);
+    // เผื่อกรณีที่ browser ใช้เวลาตรวจสอบ ARCore/ARKit หลังโหลดโมเดลเสร็จ
+    setTimeout(refreshArAvailability, 1500);
+    setTimeout(refreshArAvailability, 4000);
+  });
+
+  arBtn.addEventListener('click', ()=>{
+    if (!viewer.canActivateAR) {
+      showArToast('อุปกรณ์หรือเบราว์เซอร์นี้ยังไม่รองรับ AR — ลองเปิดด้วย Chrome (Android) หรือ Safari (iOS) เวอร์ชันล่าสุด', 5000);
+    }
+  });
+
+  // แจ้งข้อผิดพลาดการโหลดโมเดล
   const posterText = document.getElementById('poster-text');
 
   viewer.addEventListener('error', (event)=>{
@@ -588,15 +457,6 @@
         '<a href="Khon1.glb" style="color:#e4c98a" target="_blank">ไฟล์ Khon1.glb</a> โดยตรงเพื่อตรวจสอบเส้นทางไฟล์';
     }
   }, 12000);
-
-  document.getElementById('qr-toggle').addEventListener('click', ()=>{
-    const box = document.getElementById('qr-box');
-    const url = window.location.href;
-    document.getElementById('qr-img').src =
-      'https://api.qrserver.com/v1/create-qr-code/?size=340x340&margin=6&data=' + encodeURIComponent(url);
-    document.getElementById('qr-url').textContent = url;
-    box.classList.toggle('open');
-  });
 </script>
 
 </body>
